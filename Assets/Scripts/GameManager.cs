@@ -72,6 +72,10 @@ public class GameManager : MonoBehaviour
         if (lastPrefabWasSpacing)
         {
             prefabIndex = Random.Range(0, prefabPool.Length);
+            if (prefabPool[prefabIndex].name == "Spacing")
+            {
+                prefabIndex--;
+            }
             lastPrefabWasSpacing = false;
         }
         else
