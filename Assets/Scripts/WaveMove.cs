@@ -13,6 +13,9 @@ public class WaveMove : MonoBehaviour
     void Start()
     {
         currentSpeed = startSpeed;
+
+        Renderer mesh = gameObject.GetComponent<Renderer>();
+        mesh.enabled = true;
     }
     
     void FixedUpdate()
