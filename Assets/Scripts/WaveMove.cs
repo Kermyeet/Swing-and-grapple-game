@@ -24,7 +24,7 @@ public class WaveMove : MonoBehaviour
 
         currentSpeed = Mathf.Clamp(currentSpeed, startSpeed, maxSpeed);
 
-        transform.Translate(Vector3.forward * (currentSpeed * Time.deltaTime), Space.World);    
+        transform.Translate(Vector3.forward * (currentSpeed * Time.deltaTime), Space.World);
     }
     
 }

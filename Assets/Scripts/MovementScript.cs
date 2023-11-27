@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.SocialPlatforms.Impl;
 using UnityEngine.UI;
 
@@ -32,31 +33,30 @@ public class MovementScript : MonoBehaviour
     public float jumpForce = 550f;
 
     float x, y;
-    private bool jumping;
-
-    private Text scoreText;
+    private bool jumping, isPaused;
     private int score= 0;
-
-    private Text speedText;
     private float speed;
 
     public Canvas UI;
     public Canvas deathScreen;
     public Canvas startScreen;
+    public Canvas pauseScreen;
     
     public Text deadScore;
-
+    public Text currentScore;
+    public Text speedText;
+    public Text scoreText;
+    
+    public float minFOV = 60f;
+    public float maxFOV = 100f;
+    
     private void Awake()
     {
         Time.timeScale = 1;
         
         rb = gameObject.GetComponent<Rigidbody>();
 
-        scoreText = GameObject.Find("Score").GetComponent<Text>();
-
-        speedText = GameObject.Find("Speed").GetComponent<Text>();
-        
-        UI.gameObject.SetActive(false);
+        isPaused = false;
     }
 
     void Start()
@@ -67,6 +67,7 @@ public class MovementScript : MonoBehaviour
         
         scoreText.text = "Score: " + score;
         
+        // Setting the start screen animation 
         Invoke("startGameTimer", 3f);
     }
 
@@ -86,6 +87,30 @@ public class MovementScript : MonoBehaviour
             speed = 0;
         }
         speedText.text = "Speed: " + speed.ToString("F1");
+
+        currentScore.text = "Current Score:" + score;
+        
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            if (isPaused)
+            {
+                Unpause();
+            }
+            else
+            {
+                Pause();
+            }
+        }
+        
+        if (speed >= 40f) {
+            float desiredFOV = Mathf.Lerp(minFOV, maxFOV, (speed - 40f) / (maxSpeed - 40f));
+            Camera.main.fieldOfView = desiredFOV;
+        }
+        else
+        {
+            Camera.main.fieldOfView = 60f;
+
+        }
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -124,8 +149,6 @@ public class MovementScript : MonoBehaviour
             
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
-            
-            Debug.Log(other.gameObject.name);
         }
     }
 
@@ -193,7 +216,8 @@ public class MovementScript : MonoBehaviour
 
     private void Look()
     {
-        if (!deathScreen.gameObject.activeSelf)
+        // This if statement is used to stop the character from look around when the game should be paused or done
+        if (!deathScreen.gameObject.activeSelf && !pauseScreen.gameObject.activeSelf)
         {
             float mouseX = Input.GetAxis("Mouse X") * sensitivity * Time.fixedDeltaTime * sensMultiplier;
             float mouseY = Input.GetAxis("Mouse Y") * sensitivity * Time.fixedDeltaTime * sensMultiplier;
@@ -206,8 +230,6 @@ public class MovementScript : MonoBehaviour
 
             playerCam.transform.localRotation = Quaternion.Euler(xRotation, desiredX, 0);
             orientation.transform.localRotation = Quaternion.Euler(0, desiredX, 0);
-            
-
         }
     }
 
@@ -229,7 +251,7 @@ public class MovementScript : MonoBehaviour
         }
     }
 
-    //Function that is supposed to help get rid of the slidiness of players
+    // This is used to allow the player some more natural movement in the air in terms of where they're looking
     public Vector2 FindVelRelativeToLook()
     {
         float lookAngle = orientation.transform.eulerAngles.y;
@@ -278,4 +300,57 @@ public class MovementScript : MonoBehaviour
         UI.gameObject.SetActive(true);
     }
 
+
+    private bool startWasActive = false;
+    // Some button methods in movement script as it was just easier having it all on here.
+    public void Pause()
+    {
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+
+        Time.timeScale = 0f;
+        
+        pauseScreen.gameObject.SetActive(true);
+        UI.gameObject.SetActive(false);
+        if (startScreen.gameObject.activeSelf)
+        {
+            startScreen.gameObject.SetActive(false);
+            startWasActive = true;
+        }
+
+        isPaused = true;
+    }
+
+    public void Unpause()
+    {
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
+        Time.timeScale = 1f;
+        
+        pauseScreen.gameObject.SetActive(false);
+        if (startWasActive)
+        {
+            startScreen.gameObject.SetActive(true);
+            startWasActive = false;
+        }
+        else
+        {
+            UI.gameObject.SetActive(true);
+        }
+        
+
+        isPaused = false;
+    }
+
+    public void QuitGame()
+    {
+        Application.Quit();
+    }
+    
+    public void Restart()
+    {
+        Scene currentScene = SceneManager.GetActiveScene();
+        SceneManager.LoadScene(currentScene.name);
+    }
 }

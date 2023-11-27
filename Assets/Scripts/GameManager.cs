@@ -13,7 +13,7 @@ public class GameManager : MonoBehaviour
     private List<GameObject> spawnedPrefabs;
     
     private bool lastPrefabWasSpacing = false;
-
+    
     private void Awake()
     {
         loadPrefabs();
@@ -92,9 +92,5 @@ public class GameManager : MonoBehaviour
         spawnedPrefabs.Add(newPrefab);
     }
 
-    public void Restart()
-    {
-        Scene currentScene = SceneManager.GetActiveScene();
-        SceneManager.LoadScene(currentScene.name);
-    }
+
 }
