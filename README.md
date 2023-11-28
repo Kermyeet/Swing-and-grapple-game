@@ -7,5 +7,12 @@ This was made over the course of a few days and achieves its ideal grapple movem
 It is an endless runner that constantly spawns prefabs of level pieces to randomize what the player will through, with particle effects and systems that make up a sky and ground that the player should avoid.
 There are multiple UI screens to allow for the player to pause and die, but also makes use of a UI screen that updates the player on their current stats, such as their score and speed.
 
+Controls:
+WASD to move around
+SPACE to jump (can only do it on the start platform)
+LEFT MOUSE BUTTON to grapple (can only grapple when red cross appears)
+ESCAPE to pause game
+
+
 The video example:
 https://youtu.be/HByHwqhQxHE
