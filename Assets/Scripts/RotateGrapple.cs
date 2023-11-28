@@ -5,8 +5,8 @@ using UnityEngine;
 
 public class RotateGrapple : MonoBehaviour
 {
+    // This is also a simple script from Dani's Tutorial that turns the grappling gun to face the rope
     public Grappling grappling;
-
     private Quaternion desiredRotation;
     private float rotationSpeed = 5f;
 

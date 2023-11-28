@@ -7,6 +7,8 @@ using Random = UnityEngine.Random;
 
 public class TriggerExit : MonoBehaviour
 {
+    // This is set to the triggers of each prefab and uses the spawnprefab method from
+    // Game Manager to keep spawning new pieces
     private GameManager GameManager;
 
     private void Awake()

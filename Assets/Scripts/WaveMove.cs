@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class WaveMove : MonoBehaviour
 {
+    // Simple script to start the wave off slow but build speed slowly
+    // and then stop accelerating when it has hit a max speed
     public float startSpeed = 1.0f;
     public float accelerationRate = 0.1f;
     public float maxSpeed = 5.0f;
@@ -14,12 +16,15 @@ public class WaveMove : MonoBehaviour
     {
         currentSpeed = startSpeed;
 
+        // I had some weird mesh rendering issues early on but figured out
+        // it was probuilder being weird about some mesh stuff
         Renderer mesh = gameObject.GetComponent<Renderer>();
         mesh.enabled = true;
     }
     
     void FixedUpdate()
     {
+        // The calculations used to accelerate the wave
         currentSpeed += accelerationRate * Time.deltaTime;
 
         currentSpeed = Mathf.Clamp(currentSpeed, startSpeed, maxSpeed);

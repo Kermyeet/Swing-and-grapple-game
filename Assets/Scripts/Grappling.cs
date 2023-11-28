@@ -5,16 +5,24 @@ using UnityEngine.UI;
 
 public class Grappling : MonoBehaviour
 {
+    // These are all the necessary variables to get the grappling gun to work
     private LineRenderer lr;
     private Vector3 grapplePoint;
     public LayerMask whatIsGrappleable;
     public Transform gunTip, player;
     private float maxDistance = 100f;
     private SpringJoint joint;
+    private Rigidbody rigidbody1;
 
+
+    // This is just a UI image piece that gets activated when the grapple can be shot,
+    // could have just been an image or whatever, but this was early on
     public GameObject canHit;
 
+    // These variables are to get the reference from the camera position instead of guns position to grapple
     public new Transform camera;
+    
+    // Grapple pull speed was added to give the player more ability to gain momentum and swing power
     public float grapplePullSpeed = 10f;
     
     void Awake()
@@ -24,6 +32,7 @@ public class Grappling : MonoBehaviour
     }
 
     void Update() {
+        // Pretty self explanatory, just checks if mouse 1 is clicked
         if (Input.GetMouseButtonDown(0)) {
             StartGrapple();
         }
@@ -31,6 +40,8 @@ public class Grappling : MonoBehaviour
             StopGrapple();
         }
 
+        // This is used to mainly check if the distance between the camera and the grapple object
+        // and sets the red cross hair to true
         RaycastHit hit;
         if (Physics.Raycast(camera.position, camera.forward, out hit, maxDistance, whatIsGrappleable))
         {
@@ -41,7 +52,7 @@ public class Grappling : MonoBehaviour
             canHit.SetActive(false);
         }
 
-
+        // This checks that if the joint made from grappling is not null, it will add the pull power properly
         if (joint != null) {
             float distanceFromPoint = Vector3.Distance(player.position, grapplePoint);
             
@@ -49,16 +60,18 @@ public class Grappling : MonoBehaviour
             
             rigidbody1.AddForce(grappleDirection * grapplePullSpeed);
             
+            // This updates how long the grapple line is, like it only gets smaller and can't get longer
             joint.maxDistance = Mathf.Min(distanceFromPoint * 0.8f, maxDistance);
         }
     }
 
-    //Called after Update
+    //Called after Update, as was done in Dani's Tutorial and only works if the grapple has been shot
     void LateUpdate() {
         DrawRope();
     }
     
     void StartGrapple() {
+        // Process used to make the basic grappling work
         RaycastHit hit;
         if (Physics.Raycast(camera.position, camera.forward, out hit, maxDistance, whatIsGrappleable)) {
             grapplePoint = hit.point;
@@ -82,12 +95,14 @@ public class Grappling : MonoBehaviour
     }
     
     void StopGrapple() {
+        // Gets rid of any joint or rope that could be on screen
         lr.positionCount = 0;
         Destroy(joint);
     }
 
+    // The whole process below is used to make sure the rope is not drawn from the players camera
+    // and instead from the gun so it doesn't hinder the view
     private Vector3 currentGrapplePosition;
-    private Rigidbody rigidbody1;
 
     void DrawRope() {
         if (!joint) return;
@@ -102,6 +117,7 @@ public class Grappling : MonoBehaviour
         return joint != null;
     }
 
+    // This is used for the script Rotate Grapple
     public Vector3 GetGrapplePoint() {
         return grapplePoint;
     }

@@ -73,6 +73,7 @@ public class MovementScript : MonoBehaviour
 
     private void FixedUpdate()
     {
+        // Updates movement and speed counter
         Movement();
         
         speed = rb.velocity.magnitude;
@@ -80,16 +81,22 @@ public class MovementScript : MonoBehaviour
 
     void Update()
     {
+        // Constantly check inputs
         MyInput();
         Look();
+        
+        // This is if statement basically makes sure that the text can't show something like 1oe-1.988 random,
+        // had bit of a problem with that when the player suddenly stopped
         if (speed < 0.1f)
         {
             speed = 0;
         }
+        // The "F1" makes sure theres only 1 decimal point gets returned
         speedText.text = "Speed: " + speed.ToString("F1");
 
         currentScore.text = "Current Score:" + score;
         
+        // Pause
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             if (isPaused)
@@ -102,6 +109,7 @@ public class MovementScript : MonoBehaviour
             }
         }
         
+        // Changes the FOV depending on the current speed of the player, a dynamic camera FOV
         if (speed >= 40f) {
             float desiredFOV = Mathf.Lerp(minFOV, maxFOV, (speed - 40f) / (maxSpeed - 40f));
             Camera.main.fieldOfView = desiredFOV;
@@ -113,6 +121,8 @@ public class MovementScript : MonoBehaviour
         }
     }
 
+    // This was put in later as there were some mesh issues with the big wave in the start,
+    // but does the same as the trigger below
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.CompareTag("Wave"))
@@ -129,6 +139,7 @@ public class MovementScript : MonoBehaviour
         }    
     }
 
+    // Used to trigger new prefab spawns or if wave hits (or floor fog) then it ends the game
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Trigger"))
@@ -152,6 +163,7 @@ public class MovementScript : MonoBehaviour
         }
     }
 
+    // Input change from mouse and keyboard
     private void MyInput()
     {
         x = Input.GetAxisRaw("Horizontal");
@@ -159,6 +171,7 @@ public class MovementScript : MonoBehaviour
         jumping = Input.GetButton("Jump");
     }
 
+    // Movement method achieved through Dani's Tutorial
     private void Movement()
     {
         rb.AddForce(Physics.gravity * (Time.deltaTime * 10));
@@ -179,7 +192,7 @@ public class MovementScript : MonoBehaviour
 
         float multiplier = 1f, multiplierV = 1f;
 
-        // Movement in air
+        // Movement in air multiplier
         if (!grounded)
         {
             multiplier = 0.25f;
@@ -191,6 +204,7 @@ public class MovementScript : MonoBehaviour
     }
 
     // ReSharper disable Unity.PerformanceAnalysis
+    // Boing!
     private void Jump()
     {
         if (grounded && readyToJump)
@@ -214,6 +228,7 @@ public class MovementScript : MonoBehaviour
         readyToJump = true;
     }
 
+    // This method was also achieved through Dani's Tutorial
     private void Look()
     {
         // This if statement is used to stop the character from look around when the game should be paused or done
@@ -233,7 +248,8 @@ public class MovementScript : MonoBehaviour
         }
     }
 
-    //CounterMovement is mainly used for more realistic swinging
+    // CounterMovement is mainly used for start, as player can move really fast and might fall off or something,
+    // just a quick way to stop movement and also from Dani's Tutorial
     private void CounterMovement(float x, float y, Vector2 mag)
     {
         if (!grounded || jumping) return;
@@ -251,7 +267,8 @@ public class MovementScript : MonoBehaviour
         }
     }
 
-    // This is used to allow the player some more natural movement in the air in terms of where they're looking
+    // This is used to allow the player some more natural movement in the air in terms of where they're looking,
+    // but still very limited movement in the air, so git gud >:D
     public Vector2 FindVelRelativeToLook()
     {
         float lookAngle = orientation.transform.eulerAngles.y;
@@ -267,6 +284,9 @@ public class MovementScript : MonoBehaviour
         return new Vector2(xMag, yMag);
     }
     
+    
+    // This method is only used for the start to allow the player to jump off the platform, and then never jump again
+    // Again from Dani's Tutorial
     private bool cancellingGrounded;
     
     private void OnCollisionStay(Collision other) {
@@ -289,10 +309,12 @@ public class MovementScript : MonoBehaviour
         }
     }
     
+    // Stops any ability to jump
     private void StopGrounded() {
         grounded = false;
     }
 
+    // This method is used with the invoke in the start to allow for the animation of the start screen
     void startGameTimer()
     {
         startScreen.gameObject.SetActive(false);
@@ -300,9 +322,10 @@ public class MovementScript : MonoBehaviour
         UI.gameObject.SetActive(true);
     }
 
-
+    // A bool i made just in case game was paused during the start screen animation
     private bool startWasActive = false;
     // Some button methods in movement script as it was just easier having it all on here.
+    // Basically turns off and on the correct UIs and allows for the mouse on the screen again
     public void Pause()
     {
         Cursor.lockState = CursorLockMode.None;
@@ -321,6 +344,7 @@ public class MovementScript : MonoBehaviour
         isPaused = true;
     }
 
+    // Opposite actions of pause
     public void Unpause()
     {
         Cursor.lockState = CursorLockMode.Locked;
@@ -342,12 +366,13 @@ public class MovementScript : MonoBehaviour
 
         isPaused = false;
     }
-
+    // Quit
     public void QuitGame()
     {
         Application.Quit();
     }
     
+    // Load again, cuz we all lose eventually :,(
     public void Restart()
     {
         Scene currentScene = SceneManager.GetActiveScene();
